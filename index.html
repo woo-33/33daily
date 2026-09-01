@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>33Daily</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #d9d6ce;
+      color: #292a27;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    }
+    .app {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 28px 20px 100px;
+      background: #f7f3eb;
+    }
+    .logo {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 4px;
+    }
+    .date {
+      margin-top: 35px;
+      color: #8a877f;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+    }
+    h1 {
+      margin: 8px 0 28px;
+      font-family: Georgia, serif;
+      font-size: 36px;
+      font-weight: 400;
+    }
+    .empty {
+      padding: 42px 20px;
+      border-radius: 24px;
+      background: #ebe7dc;
+      text-align: center;
+    }
+    .empty-title {
+      margin-bottom: 10px;
+      font-family: Georgia, serif;
+      font-size: 25px;
+    }
+    .empty-text {
+      color: #817e76;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .add-button {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 17px;
+      background: #343630;
+      color: white;
+      font-size: 13px;
+      letter-spacing: .5px;
+      cursor: pointer;
+    }
+    .add-button.secondary {
+      background: #d8ded1;
+      color: #292a27;
+      font-weight: 600;
+    }
+    .activity-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 12px;
+      padding: 18px;
+      border-radius: 22px;
+      background: #ebe7dc;
+    }
+    .activity-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #d8ded1;
+      font-size: 23px;
+    }
+    .activity-info {
+      flex: 1;
+    }
+    .activity-name {
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+    .activity-meta {
+      margin-top: 6px;
+      color: #817e76;
+      font-size: 11px;
+    }
+    .activity-kcal {
+      text-align: right;
+      color: #817e76;
+      font-size: 10px;
+    }
+    .activity-kcal strong {
+      display: block;
+      color: #292a27;
+      font-size: 17px;
+    }
+    .total {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 22px;
+      color: #817e76;
+      font-size: 10px;
+    }
+    .total strong {
+      color: #292a27;
+      font-size: 14px;
+    }
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 12px 10px;
+      background: rgba(247, 243, 235, .96);
+      border-top: 1px solid #e4dfd5;
+      backdrop-filter: blur(10px);
+    }
+    .nav button {
+      border: none;
+      background: none;
+      color: #96928a;
+      font-size: 11px;
+    }
+    .nav button.active {
+      color: #292a27;
+      font-weight: 600;
+    }
+    .nav-icon {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 17px;
+    }
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+    .back {
+      border: none;
+      background: none;
+      padding: 0;
+      color: #817e76;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .form-title {
+      margin: 30px 0;
+      font-family: Georgia, serif;
+      font-size: 31px;
+      font-weight: 400;
+    }
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      color: #817e76;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d8d3c8;
+      border-radius: 14px;
+      background: #fcf9f2;
+      color: #292a27;
+    }
+    .types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .type-button {
+      padding: 10px 13px;
+      border: 1px solid #d6d1c6;
+      border-radius: 15px;
+      background: transparent;
+      font-size: 12px;
+    }
+    .type-button.selected {
+      background: #9baa8f;
+      border-color: #9baa8f;
+      color: white;
+    }
+    .save-button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      border: none;
+      border-radius: 17px;
+      background: #343630;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .stat {
+      padding: 17px 6px;
+      border-radius: 18px;
+      background: #ebe7dc;
+      text-align: center;
+    }
+    .stat strong {
+      display: block;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .stat span {
+      color: #817e76;
+      font-size: 9px;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+    }
+    .week {
+      text-align: center;
+      color: #99958c;
+      font-size: 9px;
+    }
+    .day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      border: none;
+      border-radius: 13px;
+      background: #ebe7dc;
+      cursor: default;
+      position: relative;
+      user-select: none;
+    }
+    .day.has {
+      background: #d8ded1;
+    }
+    .day-number {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .day-info {
+      margin-top: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      font-size: 8px;
+      line-height: 1;
+    }
+    .day-kcal {
+      color: #4a6344;
+      font-weight: 600;
+    }
+    .day-weight {
+      color: #706d64;
+    }
+    /* 删除按钮 - 直接可点，不跳转 */
+    .day .delete-btn {
+      display: none;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      padding: 0;
+      z-index: 5;
+    }
+    .day.has .delete-btn {
+      display: block;
+    }
+    .day .delete-btn:hover {
+      background: #a93226;
+      transform: scale(1.1);
+    }
+    /* 点击日期本身依然跳转到添加 */
+    .day-click-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0 12px;
+    }
+    .month-nav button {
+      background: #e4dfd5;
+      border: none;
+      border-radius: 30px;
+      padding: 6px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .month-nav span {
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+    /* 月度汇总卡片 */
+    .type-summary-card {
+      margin-bottom: 16px;
+    }
+    .type-summary-card .activity-card {
+      background: #ded9ce;
+    }
+    .sub-detail {
+      margin-left: 8px;
+      padding-left: 4px;
+      border-left: 2px solid #d0cbc0;
+    }
+    .sub-detail .activity-card {
+      background: #f2efe7;
+      margin-bottom: 4px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      min-height: unset;
+    }
+    .sub-detail .activity-icon {
+      display: none;
+    }
+    .sub-detail .activity-name {
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      font-weight: 500;
+    }
+    .sub-detail .activity-meta {
+      font-size: 10px;
+      margin-top: 2px;
+    }
+    .sub-detail .activity-kcal strong {
+      font-size: 14px;
+    }
+    .sub-detail .activity-kcal {
+      font-size: 9px;
+    }
+    .sub-detail .activity-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    @media (min-width: 700px) {
+      .app {
+        margin: 20px auto;
+        min-height: calc(100vh - 40px);
+        border-radius: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TODAY -->
+  <section id="today" class="screen active">
+    <div class="logo">33DAILY</div>
+    <div class="date" id="todayDate"></div>
+    <h1>Today's Activity</h1>
+    <div id="todayContent"></div>
+    <div class="action-buttons">
+      <button class="add-button" onclick="showAdd()">＋ ACTIVITY</button>
+      <button class="add-button secondary" onclick="showAddWeight()">⚖️ WEIGHT</button>
+    </div>
+    <div class="total" id="todayTotal"></div>
+  </section>
+
+  <!-- ADD ACTIVITY -->
+  <section id="add" class="screen">
+    <button class="back" onclick="showPage('today')">← Back</button>
+    <div class="form-title">Add Activity</div>
+    <label>DATE</label>
+    <input id="activityDate" type="date">
+    <label>ACTIVITY</label>
+    <div class="types" id="activityTypes"></div>
+    <label>DURATION · MINUTES</label>
+    <input id="duration" type="number" min="1" value="30">
+    <label>EQUIPMENT (自由填写)</label>
+    <input id="equipment" type="text" placeholder="例如: 瑜伽垫, 哑铃, 跑步机...">
+    <label>INTENSITY</label>
+    <select id="intensity">
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+    </select>
+    <label>CALORIES</label>
+    <input id="calories" type="number" placeholder="Auto calculated">
+    <button class="save-button" onclick="saveActivity()">SAVE ACTIVITY</button>
+  </section>
+
+  <!-- ADD WEIGHT -->
+  <section id="addWeight" class="screen">
+    <button class="back" onclick="showPage('today')">← Back</button>
+    <div class="form-title">Weight</div>
+    <label>DATE</label>
+    <input id="weightLogDate" type="date">
+    <label>WEIGHT · KG</label>
+    <input id="weightLogValue" type="number" step="0.1" placeholder="57.0">
+    <button class="save-button" onclick="saveWeightLog()">SAVE WEIGHT</button>
+  </section>
+
+  <!-- CALENDAR (直接删除) -->
+  <section id="calendar" class="screen">
+    <div class="logo">33DAILY</div>
+    <div class="form-title" style="margin-bottom: 4px;">Calendar</div>
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">◀</button>
+      <span id="calendarMonthLabel"></span>
+      <button onclick="changeMonth(1)">▶</button>
+    </div>
+    <div class="calendar" id="calendarHeader">
+      <div class="week">M</div><div class="week">T</div><div class="week">W</div>
+      <div class="week">T</div><div class="week">F</div><div class="week">S</div><div class="week">S</div>
+    </div>
+    <div id="calendarDays" class="calendar"></div>
+    <div style="margin-top: 18px; font-size: 13px; color: #817e76; text-align: center;">
+      <span style="background:#d8ded1; padding:2px 10px; border-radius:10px;">有记录</span> 
+      点击日期后补 · 点击 <span style="color:#c0392b; font-weight:600;">✕</span> 直接删除当天运动
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary" class="screen">
+    <div class="logo">33DAILY</div>
+    <div class="form-title">Summary</div>
+    <div id="summaryStats" class="stats"></div>
+    <div class="form-title" style="margin-top: 24px;">Monthly Log</div>
+    <div id="summaryList"></div>
+  </section>
+
+  <!-- ME -->
+  <section id="me" class="screen">
+    <div class="logo">33DAILY</div>
+    <div class="form-title">My Profile</div>
+    <label>WEIGHT · KG</label>
+    <input id="weight" type="number" step="0.1" value="57">
+    <label>HEIGHT · CM</label>
+    <input id="height" type="number" value="155">
+    <button class="save-button" onclick="saveProfile()">SAVE PROFILE</button>
+  </section>
+
+</div>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <button class="active" onclick="showPage('today')"><span class="nav-icon">○</span>Today</button>
+  <button onclick="showPage('calendar')"><span class="nav-icon">□</span>Calendar</button>
+  <button onclick="showPage('summary')"><span class="nav-icon">◒</span>Summary</button>
+  <button onclick="showPage('me')"><span class="nav-icon">○</span>Me</button>
+</nav>
+
+<script>
+  /* ========================= DATA ========================= */
+  const activities = [
+    { id: "strength", name: "Strength", icon: "🏋️", met: 5 },
+    { id: "yoga", name: "Yoga", icon: "🧘", met: 3 },
+    { id: "running", name: "Running", icon: "🏃", met: 8 },
+    { id: "walking", name: "Walking", icon: "🚶", met: 3.5 },
+    { id: "cycling", name: "Cycling", icon: "🚴", met: 6.5 },
+    { id: "hiit", name: "HIIT", icon: "🔥", met: 8 },
+    { id: "swimming", name: "Swimming", icon: "🏊", met: 7 },
+    { id: "Cardio Dance", name: "Cardio Dance", icon: "🤸", met: 2.5 },
+    { id: "other", name: "Other", icon: "✦", met: 4 }
+  ];
+
+  let records = JSON.parse(localStorage.getItem("33daily_records") || "[]");
+  let weightLogs = JSON.parse(localStorage.getItem("33daily_weight_logs") || "[]");
+  let profile = JSON.parse(localStorage.getItem("33daily_profile") || '{"weight":57,"height":155}');
+  let selectedActivity = "strength";
+  let calendarYearMonth = getToday().slice(0, 7);
+
+  /* ========================= 工具 ========================= */
+  function getToday() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatDateDisplay(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).toUpperCase();
+  }
+
+  /* ========================= 初始化 ========================= */
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("todayDate").textContent = formatDateDisplay(getToday());
+    document.getElementById("activityDate").value = getToday();
+    document.getElementById("weightLogDate").value = getToday();
+    document.getElementById("weight").value = profile.weight;
+    document.getElementById("height").value = profile.height;
+    renderActivityTypes();
+    renderToday();
+    renderCalendarMonth(calendarYearMonth);
+    renderSummary();
+  });
+
+  /* ========================= 页面切换 ========================= */
+  function showPage(page) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
+    document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+    const map = { today: 0, calendar: 1, summary: 2, me: 3 };
+    const idx = map[page];
+    if (idx !== undefined) document.querySelectorAll(".nav button")[idx].classList.add("active");
+    if (page === "today") renderToday();
+    if (page === "calendar") renderCalendarMonth(calendarYearMonth);
+    if (page === "summary") renderSummary();
+  }
+
+  function showAdd() {
+    document.getElementById("activityDate").value = getToday();
+    document.getElementById("equipment").value = "";
+    showPage("add");
+  }
+  function showAddWeight() {
+    document.getElementById("weightLogDate").value = getToday();
+    document.getElementById("weightLogValue").value = profile.weight;
+    showPage("addWeight");
+  }
+
+  /* ========================= 活动类型 ========================= */
+  function renderActivityTypes() {
+    const container = document.getElementById("activityTypes");
+    container.innerHTML = "";
+    activities.forEach(act => {
+      const btn = document.createElement("button");
+      btn.className = "type-button" + (act.id === selectedActivity ? " selected" : "");
+      btn.innerHTML = `${act.icon} ${act.name}`;
+      btn.onclick = () => { selectedActivity = act.id; renderActivityTypes(); };
+      container.appendChild(btn);
+    });
+  }
+
+  /* ========================= 卡路里计算 ========================= */
+  function calculateCalories() {
+    const activity = activities.find(a => a.id === selectedActivity);
+    const duration = Number(document.getElementById("duration").value) || 0;
+    const intensity = document.getElementById("intensity").value;
+    const mult = { low: 0.8, medium: 1, high: 1.25 };
+    return Math.round(activity.met * profile.weight * duration / 60 * mult[intensity]);
+  }
+  document.getElementById("duration").addEventListener("input", () => {
+    document.getElementById("calories").value = calculateCalories();
+  });
+  document.getElementById("intensity").addEventListener("change", () => {
+    document.getElementById("calories").value = calculateCalories();
+  });
+
+  /* ========================= 保存活动 ========================= */
+  function saveActivity() {
+    const date = document.getElementById("activityDate").value;
+    const duration = Number(document.getElementById("duration").value);
+    if (!date || !duration) { alert("Please enter date and duration."); return; }
+    const activity = activities.find(a => a.id === selectedActivity);
+    let calories = Number(document.getElementById("calories").value);
+    if (!calories) calories = calculateCalories();
+    const equipmentText = document.getElementById("equipment").value.trim() || "—";
+    records.push({
+      id: Date.now(),
+      date: date,
+      type: selectedActivity,
+      duration: duration,
+      equipment: equipmentText,
+      intensity: document.getElementById("intensity").value,
+      calories: calories
+    });
+    localStorage.setItem("33daily_records", JSON.stringify(records));
+    showPage("today");
+  }
+
+  /* ========================= 保存体重 ========================= */
+  function saveWeightLog() {
+    const date = document.getElementById("weightLogDate").value;
+    const val = Number(document.getElementById("weightLogValue").value);
+    if (!date || !val) { alert("Please enter a valid weight and date."); return; }
+    const idx = weightLogs.findIndex(item => item.date === date);
+    if (idx >= 0) weightLogs[idx].weight = val;
+    else weightLogs.push({ id: Date.now(), date: date, weight: val });
+    localStorage.setItem("33daily_weight_logs", JSON.stringify(weightLogs));
+    profile.weight = val;
+    document.getElementById("weight").value = val;
+    localStorage.setItem("33daily_profile", JSON.stringify(profile));
+    showPage("today");
+  }
+
+  /* ========================= TODAY ========================= */
+  function renderToday() {
+    const container = document.getElementById("todayContent");
+    const today = getToday();
+    const todayRecords = records.filter(r => r.date === today);
+    const todayWeight = weightLogs.find(w => w.date === today);
+
+    if (todayRecords.length === 0 && !todayWeight) {
+      container.innerHTML = `<div class="empty"><div class="empty-title">No activity yet.</div><div class="empty-text">How would you like to move today?</div></div>`;
+    } else {
+      let html = "";
+      if (todayWeight) {
+        html += `<div class="activity-card"><div class="activity-icon">⚖️</div><div class="activity-info"><div class="activity-name">Weight</div><div class="activity-meta">${todayWeight.date}</div></div><div class="activity-kcal"><strong>${todayWeight.weight}</strong> KG</div></div>`;
+      }
+      html += todayRecords.map(r => {
+        const act = activities.find(a => a.id === r.type);
+        return `<div class="activity-card"><div class="activity-icon">${act.icon}</div><div class="activity-info"><div class="activity-name">${act.name}</div><div class="activity-meta">${r.duration} MIN · ${r.equipment} · ${r.intensity}</div></div><div class="activity-kcal"><strong>${r.calories}</strong> KCAL</div></div>`;
+      }).join("");
+      container.innerHTML = html;
+    }
+
+    const totalMinutes = todayRecords.reduce((s, r) => s + Number(r.duration), 0);
+    const totalCal = todayRecords.reduce((s, r) => s + Number(r.calories), 0);
+    document.getElementById("todayTotal").innerHTML = `
+      <span><strong>${todayRecords.length}</strong> ACTIVITIES</span>
+      <span><strong>${totalMinutes}</strong> MIN</span>
+      <span><strong>${totalCal}</strong> KCAL</span>
+    `;
+  }
+
+  /* ========================= CALENDAR (直接删除，不跳转) ========================= */
+  function changeMonth(delta) {
+    const [year, month] = calendarYearMonth.split('-').map(Number);
+    const newDate = new Date(year, month - 1 + delta, 1);
+    calendarYearMonth = `${newDate.getFullYear()}-${String(newDate.getMonth()+1).padStart(2,'0')}`;
+    renderCalendarMonth(calendarYearMonth);
+  }
+
+  // 删除指定日期的所有运动记录 (保留体重)
+  function deleteDayActivities(dateStr) {
+    if (!dateStr) return;
+    const before = records.length;
+    records = records.filter(r => r.date !== dateStr);
+    if (records.length === before) {
+      alert('该日期没有运动记录可删除。');
+      return;
+    }
+    localStorage.setItem("33daily_records", JSON.stringify(records));
+    // 重新渲染日历和今日、摘要
+    renderCalendarMonth(calendarYearMonth);
+    renderToday();
+    renderSummary();
+  }
+
+  function renderCalendarMonth(ym) {
+    const container = document.getElementById("calendarDays");
+    container.innerHTML = "";
+    const [year, month] = ym.split('-').map(Number);
+    document.getElementById("calendarMonthLabel").textContent = `${year} · ${String(month).padStart(2,'0')}`;
+
+    const first = new Date(year, month - 1, 1);
+    const totalDays = new Date(year, month, 0).getDate();
+    let start = first.getDay();
+    start = start === 0 ? 6 : start - 1;
+
+    for (let i = 0; i < start; i++) {
+      const empty = document.createElement("div");
+      container.appendChild(empty);
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const dayRecords = records.filter(r => r.date === dateStr);
+      const dayWeight = weightLogs.find(w => w.date === dateStr);
+      const totalKcal = dayRecords.reduce((s, r) => s + Number(r.calories), 0);
+
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      if (dayRecords.length > 0 || dayWeight) dayDiv.classList.add("has");
+
+      // 点击区域 (日期 + 信息)
+      const clickArea = document.createElement("div");
+      clickArea.className = "day-click-area";
+      let infoHtml = "";
+      if (totalKcal > 0) infoHtml += `<span class="day-kcal">${totalKcal}c</span>`;
+      if (dayWeight) infoHtml += `<span class="day-weight">${dayWeight.weight}kg</span>`;
+      clickArea.innerHTML = `<span class="day-number">${day}</span><div class="day-info">${infoHtml}</div>`;
+      // 点击日期 → 后补记录 (跳转到添加)
+      clickArea.addEventListener('click', () => {
+        document.getElementById("activityDate").value = dateStr;
+        document.getElementById("equipment").value = "";
+        showPage("add");
+      });
+      dayDiv.appendChild(clickArea);
+
+      // 删除按钮 (直接删除，不跳转)
+      if (dayRecords.length > 0) {
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-btn";
+        delBtn.textContent = "✕";
+        delBtn.title = "删除该日所有运动记录";
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // 阻止冒泡到点击区域
+          if (confirm(`确定要删除 ${dateStr} 的所有运动记录吗？`)) {
+            deleteDayActivities(dateStr);
+          }
+        });
+        dayDiv.appendChild(delBtn);
+      }
+
+      container.appendChild(dayDiv);
+    }
+  }
+
+  /* ========================= SUMMARY (当月汇总+明细) ========================= */
+  function renderSummary() {
+    const month = getToday().slice(0, 7);
+    const monthRecords = records.filter(r => r.date.startsWith(month));
+    const monthWeightLogs = weightLogs.filter(w => w.date.startsWith(month));
+
+    const workouts = monthRecords.length;
+    const minutes = monthRecords.reduce((s, r) => s + Number(r.duration), 0);
+    const calories = monthRecords.reduce((s, r) => s + Number(r.calories), 0);
+    let latestWeightDisplay = "--";
+    if (weightLogs.length > 0) {
+      const sorted = weightLogs.slice().sort((a, b) => a.date.localeCompare(b.date));
+      latestWeightDisplay = sorted[sorted.length - 1].weight + " KG";
+    }
+
+    document.getElementById("summaryStats").innerHTML = `
+      <div class="stat"><strong>${workouts}</strong><span>WORKOUTS</span></div>
+      <div class="stat"><strong>${(minutes / 60).toFixed(1)}</strong><span>HOURS</span></div>
+      <div class="stat"><strong>${calories}</strong><span>KCAL</span></div>
+      <div class="stat"><strong>${latestWeightDisplay}</strong><span>WEIGHT</span></div>
+    `;
+
+    const listContainer = document.getElementById("summaryList");
+    if (monthRecords.length === 0 && monthWeightLogs.length === 0) {
+      listContainer.innerHTML = `<div class="empty"><div class="empty-title">No records this month.</div></div>`;
+      return;
+    }
+
+    let html = "";
+
+    if (monthWeightLogs.length > 0) {
+      const sortedWeight = monthWeightLogs.slice().sort((a, b) => b.date.localeCompare(a.date));
+      html += `<div class="type-summary-card"><div class="activity-card"><div class="activity-icon">⚖️</div><div class="activity-info"><div class="activity-name">Weight</div><div class="activity-meta">${sortedWeight.length} 次记录</div></div><div class="activity-kcal"><strong>${sortedWeight[0].weight}</strong> KG (最新)</div></div>`;
+      html += `<div class="sub-detail">`;
+      sortedWeight.forEach(w => {
+        html += `<div class="activity-card"><div class="activity-info"><div class="activity-name">${w.date}</div><div class="activity-meta">体重</div></div><div class="activity-kcal"><strong>${w.weight}</strong> KG</div></div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    const typeMap = {};
+    monthRecords.forEach(r => {
+      if (!typeMap[r.type]) typeMap[r.type] = [];
+      typeMap[r.type].push(r);
+    });
+
+    const sortedTypes = Object.keys(typeMap).sort((a, b) => {
+      const sumA = typeMap[a].reduce((s, r) => s + Number(r.calories), 0);
+      const sumB = typeMap[b].reduce((s, r) => s + Number(r.calories), 0);
+      return sumB - sumA;
+    });
+
+    sortedTypes.forEach(typeId => {
+      const items = typeMap[typeId];
+      const totalCal = items.reduce((s, r) => s + Number(r.calories), 0);
+      const act = activities.find(a => a.id === typeId);
+      if (!act) return;
+      items.sort((a, b) => b.date.localeCompare(a.date));
+
+      html += `<div class="type-summary-card">`;
+      html += `<div class="activity-card"><div class="activity-icon">${act.icon}</div><div class="activity-info"><div class="activity-name">${act.name}</div><div class="activity-meta">${items.length} 次 · 共 ${items.reduce((s,r)=>s+Number(r.duration),0)} min</div></div><div class="activity-kcal"><strong>${totalCal}</strong> KCAL</div></div>`;
+      html += `<div class="sub-detail">`;
+      items.forEach(r => {
+        html += `<div class="activity-card"><div class="activity-info"><div class="activity-name">${r.date}</div><div class="activity-meta">${r.duration} min · ${r.equipment} · ${r.intensity}</div></div><div class="activity-kcal"><strong>${r.calories}</strong> KCAL</div></div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    listContainer.innerHTML = html;
+  }
+
+  /* ========================= 保存个人资料 ========================= */
+  function saveProfile() {
+    profile.weight = Number(document.getElementById("weight").value) || 57;
+    profile.height = Number(document.getElementById("height").value) || 155;
+    localStorage.setItem("33daily_profile", JSON.stringify(profile));
+    alert("Profile saved.");
+  }
+
+  window.renderCalendarMonth = renderCalendarMonth;
+  window.changeMonth = changeMonth;
+</script>
+</body>
+</html>
